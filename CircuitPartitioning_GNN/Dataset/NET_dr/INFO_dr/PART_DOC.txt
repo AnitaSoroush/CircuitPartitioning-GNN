@@ -1,0 +1,324 @@
+the circuit is described by the following sections:
+
+(1) Dimensions     ==> this gives number of nets and modules in the 
+		       circuits
+
+(2) Connections    ==> describes the connections between modules 
+		       through signals
+
+(3) Sizes          ==> describes the sizes of modules (in this case 
+		       the widths) assume the heights are equal 
+		       (say 150)
+(4) Fix            ==> this section describes the modules that have a 
+		       fixed location (I will describe it in detail 
+		       later on)
+(5) Weights        ==> this section can determine that nets have 
+		       different weights so that preference can be 
+		       given to some over others
+(6) END            ==> identifies end of description of the circuit
+
+-----------------------------------------------------------------------
+NOW EACH SECTION IN DETAIL:
+-----------------------------------------------------------------------
+==> Dimensions
+  ==> nets = 59 : 1.0
+  ==> modules = 64 : 1.0
+==> ;
+
+"nets" means the number of signals that connect different modules
+together  see Connections section later on for detail.
+Now returning back to the Dimensions section, the value : 1.0 means that
+all nets have the same weight of value 1.0 . This value can be changed 
+to whatever in the "Weights" Section later on, as I have explained 
+above.
+
+"modules" refers to the number of units or cells in the circuit both 
+that are fixed and that are moveable.
+A value of 1.0 also for the modules means that all modules have a size 
+of 1.0 this value can be changed later on in the "Sizes" section.
+
+-----------------------------------------------------------------------
+==> Connections
+  ==> 1 : 52 59 -1
+  ==> 2 : 51 52 -1
+==> ;
+1 refers to net (or signal) number 1 and it connects modules 52 and 59
+and -1 is a delimiter, then in the second line 2 refers to net number 2
+and it connects moudles 51 and 52 and so on.
+
+-----------------------------------------------------------------------
+==> Sizes
+  ==> 1 : 50
+  ==> 2 : 30
+ ..........
+==> ;
+In the sizes section we supply only the widths of the cells since we 
+have most heights to be the same (say 150 or 300) 
+here 1 : 50 means that module number 1 has a width of 50 units .....
+-----------------------------------------------------------------------
+==> Fix
+  ==> 53 : 1 -1
+  ==> 54 : 2 -1 
+==> ;
+In this sections we point out which modules to be fixed and specify 
+their locations, for example 53 : 0 -1  means that this module (53) 
+is to be fixed in block 1 and module 54 is to be fixed in block 2.
+-----------------------------------------------------------------------
+The part_hyb.exe code is a partitioning code that utilizes the 
+following:
+-----------------------------------------------------------------------
+1) Tabu Search
+2) Sanchis Interchange method
+3) Genetic Algorithms
+
+The following settings are used:
+-------------------------------
+[1] if tabu_do_interchange (e.g Tdi1) is used then depending on the its
+    value a certain action will be used as follows:
+    (a) value of '1' : then interchange code will be invoked
+        first until it gets stuck at a local minima and then the
+        tabu search code will be invoked.
+    (b) value of '2' : then interchange code will be invoked
+        at the end (after the tabu search code)
+    (c) value of '3' : then interchange code will be invoked 
+        at the start and at the end.
+
+[2] if tabu_multi_ga (e.g +Tmg10) is used then we actually using the 
+    genetic algorithm to produce many good initial solutions that can
+    be used by Tabu Search.
+    Also depending on its value i,e Tmg10 means the generation
+    size is 10 and number of solutions returned by Genetic 
+    Algorithm is 10.
+    These solutions are not sorted but an index to the best soltions
+    are found in an array called index1. The algorithm then
+    uses as many good initial solutions as required. depending
+    on the number of runs or the number of phases.
+
+[3] if tabu_ga_diversify (e.g +Tgd10) is used then we actually are using
+    the tabu search first to get solutions, while solving the problem we
+    gather different samples that will be used by the Genetic 
+    Algorithm to diversify the solution which then passes these 
+    solutions to the Tabu Search Algorithm again to find a better 
+    solution.
+
+-----------------------------------------------------------------------
+THE FOLLOWING GIVES SOME EXPLANATION TO FLAGS USED WITHIN THE ALGORITHM:
+Some of the flags here are enabled by just typing the flag (i.e +Ids) 
+and others have to have a value associated with them (+Idl3 for 
+example will allow the debugging level for interchange method to be 
+set to 3)
+Note the following:
+The Tabu search flags start with +T
+The Genetic algorithm flags start with +G
+The Sanchis interchange flas start with +I
+General flags just start with +E
+-----------------------------------------------------------------------
+GENERAL FLAGS:
+-------------
++Eab(value)   ==> determine if we want to arrange blocks such that the 
+		  final wire length is minmimized.
++Efi(string)  ==> string is the name of the "input file" to be used.
++Efo(string)  ==> string is the name of the "output file" to be used. 
++Efs(string)  ==> string is the name of the "start file" to be used 
+		  (initial partition)
++Ebn(value)   ==> value  is the "number of blocks" used for the 
+		  partition.
++Ecs(value)   ==> value  is to produce "circuit statistics"
++Eit(value)   ==> value  is used to determine the "initialization 
+		  technique" for partitioning
++Enp(value)   ==> value  is used to determine the "number of initial 
+		  partitions" to reserve.
++Epd(value)   ==> "position diversify" value  is used to determine 
+		  rate  of samples taken from TS to GA
++Esd(value)   ==> "search diversify" value  is used to force TS to 
+		  diversify the search
+
+SANCHIS FLAGS(local search)
+---------------------------
++Ids         ==> "display results on screen" while running the program
++Idf         ==> "display results in file" while running the program
++Idl(value)  ==> set the "debugging level" for Interchange method
+----------------
++Iig(value)  ==> use "genetic algorithm initially" before local search
+----------------
++Ifg(value)  ==> use "genetic algorithm finally" after local search
+----------------
++Inm(value)  ==> value determines the "number of moves" allowed within 
+		 local search.
++Inp(value)  ==> value determines the "number of passes" allowed 
+		 within local search.
++Inr(value)  ==> value determines the "number of runs" allowd within 
+		 local search.
+----------------
++Ion(value)  ==> "output nets" cut in the partition
++Iop(value)  ==> "output partition" (best result so far)
+----------------
++Itm(value)  ==> this allows the difference in final partition to 
+		 have (value) determine how many modules in one block 
+		 are more than the other.
+		 if the blocks where originally 50:50 for a two block 
+		 partition then +Itm1 would allow the final partition 
+		 to be 49:51 
++Itv(value)  ==> same as above but in percent i.e +Itv0.1 means 10% 
+		 tolerance
+----------------
+GENETIC FLAGS(for initial solutions and search diversification)
+----------------
++Gcp(value)  ==> number of "cross points" used for the cross over 
+		 operator
++Gct(value)  ==> the "cross over technique" used
+----------------
++Gdf         ==> "display results in file" while running
++Gdl(value)  ==> "debug level used" in genetic algorithm
++Gds         ==> "display screen" while running
+----------------
++Gec         ==> set the "equi crossover" points 
+----------------
++Gfc(value)  ==> set the "frequency of crossover"
++Gfi(value)  ==> enable the interchange after each generation of GA 
+		 and value will determine number of passes.
++Gfm(value)  ==> set the "frequency of mutation"
++Gfv(value)  ==> set the "final number of moves for interchange" 
+		 within a pass.
+----------------
++Ggs(value)  ==> set the "generation size" to be used within GA.
+----------------
++Gii(value)  ==> enable the interchange before each generation of GA 
+		 and value will determine number of passes.
++Giv(value)  ==> set the "initial number of moves for interchange" 
+		 within a pass.
+----------------
++Gmm(value)  ==> set the "mutation method" to be used 
+----------------
++Gop(value)  ==> "output partition" value of the GA alg
++Gos(value)  ==> "output statistics" for each generation
+----------------
++Gpa(value)  ==> determine the "pattern" to initialize the GA alg 
+		 population.
++Gpd(value)  ==> determine the "population division" to be used
++Gpf         ==> enable the plotting of data for GA
++Gpi(value)  ==> set the "popultion index" that will be used for 
+		 selecting individuals
++Gpn         ==> enable the "printing of nets" cut
++Gps(value)  ==> set the "population size" to be used.
+----------------
++Grm(value)  ==> determine the replace method used for the GA alg
++Grs(value)  ==> determine the repair solution method to be used with GA
+----------------
++Gsc(value)  ==> determine the statistics calculation method to be used.
++Gsd(value)  ==> determine the "selection division" method.
++Gsm(value)  ==> determine the "selection method" to be used.
+----------------
+
+TABU SEARCH FLAGS:
+-----------------
++Tas(value)  ==> determine the value of "aspiration" to be used
+-----------------
++Tdg(value)  ==> force TS to "do GA" in all its phases (NOT USED)
++Tdl(value)  ==> set the "debug level" for TS
++Tds         ==> enable display screen while running
++Tdf         ==> enable display file while running
+-----------------
++Tfi(value)  ==> set interchange routine to perform local search after 
+		 TS
++Tfg(value)  ==> set GA routine to perform search after TS
++Tfv(value)  ==> set the number of moves to be performed by Sanchis 
+		 Interchange if it was enable after TS is run
+-----------------
++Tgd(value)  ==> enable GA to diversify the search with gensize = value
++Tgp(value)  ==> enable TS to collect samples while searching for 
+		 ploting with gap=value
++Tgr(value)  ==> set the rate by which TS will collect the best 
+		 solutions encountered so far. For search 
+		 diversification purposes.
+-----------------
++Tii(value)  ==> enable the interchange routine to do local search 
+		 before TS
++Tif(value)  ==> enable the TS to perform diversification and 
+		 intensification of search
++Tig(value)  ==> enable the GA to perform initial search for one good 
+		 starting point 
++Tit(value)  ==> set the value by which the Tabu List would increase 
+		 every run.
++Tiv(value)  ==> set the number of moves to be performed by Sanchis 
+		 Interchange if it was enable before TS is run.
+-----------------
++Tmg(value)  ==> enable the GA to perform initial search for many good 
+		 starting points
++Tml(value)  ==> enable the long term memory for TS 
++Tmm(value)  ==> enable the medium term memory for TS 
++Tms(value)  ==> enable the calculations of statistics using TS 
+		 (movements e.t.c)
++Tmt(value)  ==> enable the reseting of the Tabu List within a run to 
+		 improve performance.
+-----------------
++Tni(value)  ==> set the maximum number of iterations between 
+		 improvements before the TS routine would terminate
++TnI(value)  ==> same as above except that the value is multiplied by 
+		 the number of modules within the circuit.
++Tnp(value)  ==> set the value of number of phases to be used within 
+		 the TS routine.
++Tnr(value)  ==> set the value of number of runs to be used within the 
+		 TS routine.
+-----------------
++Toc(value)  ==> enable the routine to print the circuit after it is 
+		 read (for debug purposes only)
++Ton(value)  ==> enable the routine to output the nets cut after 
+		 partitioning.
++Top(value)  ==> enable the routine to output the partition result
++Tov(value)  ==> enable the routine to output the count of times the 
+		 modules have been registered in the Tabu List 
+-----------------
++Tpl         ==> enable the TS routine to print cuts as routine is 
+		 progressing for plotting purposes.
++Tpm         ==> enable the routine to print the total times each 
+		 module has been moved during the life of the algorithm
++Tpn         ==> enable the routine to print the nets that are cut.
+-----------------
++Trt         ==> enable the routine to reset the Tabu List for 
+		 performance reasons
+-----------------
++Tsb(value)  ==> set the way by which TS would update the sizes of 
+		 blocks 
++Tsd(value)  ==> enable the TS to perform self diversification       
+-----------------
++Ttc(value)  ==> set the tabu criteria that will be used for TS, here 
+		 tabu criteria means setting a way to list modules 
+		 in the Tabu List
++Ttl(value)  ==> set the length of the Tabu List = value
++Ttm(value)  ==> set the tolerance of modules
++Tts(value)  ==> set the tabu style to be used 
++Ttu(value)  ==> set the way by which we update the Tabu List
++Ttv(value)  ==> same as above but percentage wise.
+-----------------------------------------------------------------------
+THE FOLLOWING ARE EXAMPLES OF USING THE CODE TO PARTITION A CIRCUIT 
+CALLED CHIP1.dat USING DIFFERENT SETTINGS:
+-----------------------------------------------------------------------
+part_tabu_hyb.exe +fichip1.dat +fochip1_2.mg10 +bn2  +Tmg10  
+
+Here the code will invoke the Genetic algorithm to produce different 
+initial solutions (Tmg10) (this produces 10 different solutions) and 
+then Tabu Search will make use of the good starting points and 
+improve upon them.
+-----------------------------------------------------------------------
+part_tabu_hyb.exe +fichip1.dat +fochip1_2.mg10 +bn2  +Tmg10   +Tdi1
+
+Here the code will invoke the Genetic algorithm to produce different 
+initial solutions (Tmg10) (this produces 10 different solutions) and 
+then Sanchis interchange procedure will be invoked to get a local 
+solution, and finally Tabu Search will be invoked.
+-----------------------------------------------------------------------
+part_tabu_hyb.exe +fichip1.dat +fochip1_2.gd10 +bn2  +Tgd10 
+
+This will use the Tabu search algorithm to do the local search and 
+then envoke the genetic algorithm for diversification (Tgd10) , and 
+then local search is used again.
+-----------------------------------------------------------------------
+part_tabu_hyb.exe +fichip1.dat +fochip1_2.gd10_int +bn2  +Tgd10 +Tdi1 
+
+This will use the Sancis Interchange to do the initial local search 
+(e.g Tdi1) and then invoke Tabu search for further improvement and 
+next the genetic algorithm will be used for search diversification 
+(Tgd10) , and finally the Tabu search will be invoked for final 
+improvement of the search.
+-----------------------------------------------------------------------

@@ -2,7 +2,7 @@ Circuit clustering and circuit partitioning are essential tasks in the Very Larg
 
 ()[] consists of 1 Python file and 3 folders:
 * [KPartitions.py](https://github.com/AnitaSoroush/CircuitPartitioning-GNN/blob/main/CircuitPartitioning_GNN/KPartitions.py) is the main partitioning code to run (you can adjust what combination of initial features you want to use)
-* (Dataset)[https://github.com/AnitaSoroush/CircuitPartitioning-GNN/tree/main/CircuitPartitioning_GNN/Dataset/NET_dr] folder contains a vesy simple sample of the dataset acceptable to (cirpart)[https://github.com/AnitaSoroush/CircuitPartitioning-GNN/tree/main/CircuitPartitioning_GNN/cirpart].
-* (cirpart)[https://github.com/AnitaSoroush/CircuitPartitioning-GNN/tree/main/CircuitPartitioning_GNN/cirpart] folder contains some necessary tools and Python packages developed for this project, mainly to address reading the netlist circuit datasets and turning them to manipulable graphs.
-* and finally the results are pickled in (results)[https://github.com/AnitaSoroush/CircuitPartitioning-GNN/tree/main/CircuitPartitioning_GNN/results] folder.
+* [Dataset](https://github.com/AnitaSoroush/CircuitPartitioning-GNN/tree/main/CircuitPartitioning_GNN/Dataset/NET_dr) folder contains a vesy simple sample of the dataset acceptable to [cirpart](https://github.com/AnitaSoroush/CircuitPartitioning-GNN/tree/main/CircuitPartitioning_GNN/cirpart).
+* [cirpart](https://github.com/AnitaSoroush/CircuitPartitioning-GNN/tree/main/CircuitPartitioning_GNN/cirpart) folder contains some necessary tools and Python packages developed for this project, mainly to address reading the netlist circuit datasets and turning them to manipulable graphs.
+* and finally the results are pickled in [results](https://github.com/AnitaSoroush/CircuitPartitioning-GNN/tree/main/CircuitPartitioning_GNN/results) folder.
 
